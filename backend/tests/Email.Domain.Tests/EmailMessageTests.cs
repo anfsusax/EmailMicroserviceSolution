@@ -59,6 +59,8 @@ public class EmailMessageTests
         var future = DateTimeOffset.UtcNow.AddHours(1);
         var email = EmailMessage.Create(content, new[] { recipient }, scheduledFor: future);
 
+
+        //assert
         Assert.False(email.ShouldProcess(DateTimeOffset.UtcNow));
     }
 }
