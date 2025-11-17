@@ -21,12 +21,12 @@ docker compose up rabbitmq smtp-service otel-collector -d
 ### 2. Rodar a API (.NET)
 ```bash
 # No Visual Studio:
-# 1. Abra EmailMicroserviceSolution.sln
+# 1. Abra backend/EmailMicroserviceSolution.sln
 # 2. Configure Email.Api como projeto de inicialização
 # 3. Pressione F5
 
 # Ou via terminal:
-cd src/Email.Api
+cd backend/src/Email.Api
 dotnet run
 ```
 
@@ -39,7 +39,7 @@ Verifique no navegador: `http://localhost:5041/swagger`
 # Configure Email.Worker como segundo projeto de inicialização
 
 # Ou via terminal:
-cd src/Email.Worker
+cd backend/src/Email.Worker
 dotnet run
 ```
 

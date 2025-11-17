@@ -24,13 +24,13 @@ jobs:
         dotnet-version: ${{ env.DOTNET_VERSION }}
 
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore backend/EmailMicroserviceSolution.sln
 
     - name: Build solution
-      run: dotnet build --no-restore --configuration Release
+      run: dotnet build backend/EmailMicroserviceSolution.sln --no-restore --configuration Release
 
     - name: Run tests
-      run: dotnet test --no-build --configuration Release --verbosity normal --collect:"XPlat Code Coverage"
+      run: dotnet test backend/EmailMicroserviceSolution.sln --no-build --configuration Release --verbosity normal --collect:"XPlat Code Coverage"
 
     - name: Upload test results
       uses: actions/upload-artifact@v4
@@ -54,8 +54,8 @@ jobs:
     - name: Build Email.Api image
       uses: docker/build-push-action@v5
       with:
-        context: .
-        file: ./src/Email.Api/Dockerfile
+        context: ./backend
+        file: ./backend/src/Email.Api/Dockerfile
         push: false
         tags: email-api:latest
         cache-from: type=gha
@@ -64,8 +64,8 @@ jobs:
     - name: Build Email.Worker image
       uses: docker/build-push-action@v5
       with:
-        context: .
-        file: ./src/Email.Worker/Dockerfile
+        context: ./backend
+        file: ./backend/src/Email.Worker/Dockerfile
         push: false
         tags: email-worker:latest
         cache-from: type=gha
@@ -74,8 +74,8 @@ jobs:
     - name: Build Email.ApiGateway image
       uses: docker/build-push-action@v5
       with:
-        context: .
-        file: ./src/Email.ApiGateway/Dockerfile
+        context: ./backend
+        file: ./backend/src/Email.ApiGateway/Dockerfile
         push: false
         tags: email-gateway:latest
         cache-from: type=gha

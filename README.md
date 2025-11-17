@@ -1,126 +1,191 @@
-## EmailMicroserviceSolution
+# Email Microservice Solution
 
-[![CI - Build and Test](https://github.com/anfsusax/EmailMicroserviceSolution/actions/workflows/ci.yml/badge.svg)](https://github.com/anfsusax/EmailMicroserviceSolution/actions/workflows/ci.yml)
-[![Docker Compose Integration Test](https://github.com/anfsusax/EmailMicroserviceSolution/actions/workflows/docker-compose-test.yml/badge.svg)](https://github.com/anfsusax/EmailMicroserviceSolution/actions/workflows/docker-compose-test.yml)
+Solução completa de microserviços para envio de e-mails com arquitetura moderna, incluindo API REST, Worker assíncrono, API Gateway e frontend Angular.
 
-Este repositório traz um ecossistema de microserviços .NET 8 preparado para orquestrar o envio confiável de boletos e outras mensagens digitais. A arquitetura segue DDD, Clean Architecture e boas práticas de mensageria assíncrona, entregando API, Worker, Gateway, infraestrutura de observabilidade e orquestração Docker.
+## 📋 Estrutura do Projeto
 
-### Visão Geral (parábola inspirada em Neemias 4)
+```
+AnfMicroserviceSolution/
+├── backend/                    # Código backend (.NET 8)
+│   ├── src/                   # Projetos da solução
+│   │   ├── Email.Api/         # API REST principal
+│   │   ├── Email.Worker/      # Worker para processamento assíncrono
+│   │   ├── Email.ApiGateway/  # API Gateway (Ocelot)
+│   │   ├── Email.Application/ # Camada de aplicação
+│   │   ├── Email.Domain/      # Entidades e regras de negócio
+│   │   └── Email.Infrastructure/ # Implementações (RabbitMQ, SMTP, etc)
+│   ├── tests/                 # Testes unitários
+│   ├── deploy/                # Configurações de deploy
+│   ├── docs/                  # Documentação técnica
+│   └── EmailMicroserviceSolution.sln
+├── frontend/                   # Frontend Angular
+│   └── email-front/           # Aplicação Angular
+├── scripts/                    # Scripts utilitários
+├── docs/                       # Documentação geral
+├── docker-compose.yml          # Orquestração Docker
+└── .github/                    # GitHub Actions (CI/CD)
+```
 
-Assim como Neemias reconstruiu os muros de Jerusalém com equipes em turnos (Neemias 4), dividimos o sistema em frentes especializadas que trabalham em paralelo mas compartilham a mesma visão:
+## 🚀 Início Rápido
 
-- **Email.Api**: o “portão principal” que valida e autentica cada pedido (JWT/OAuth2), expõe `POST /api/emails` e acompanha o status.
-- **Email.Application / Email.Domain**: o “plano mestre” com entidades, regras e casos de uso (fila, retries, métricas).
-- **Email.Infrastructure**: os “pedreiros” que falam com RabbitMQ, SMTP, telemetria e armazenamento de status.
-- **Email.Worker**: o “vigia noturno” que consome a fila e garante o envio com política de retentativa.
-- **Email.ApiGateway**: o “muro externo” baseado em Ocelot para centralizar chamadas e aplicar políticas de borda.
-- **Observabilidade & Operações**: OpenTelemetry, ElasticSearch, Grafana, RabbitMQ e Mailhog sob orquestração Docker.
+### Pré-requisitos
+- .NET 8 SDK
+- Node.js 18+ e npm
+- Docker Desktop
+- Visual Studio 2022 ou VS Code
 
-### Estrutura
+### Passos
 
-- `src/Email.Domain`: entidades (`EmailMessage`, `Attachment`, `Recipient`), value objects e enum `EmailStatus`.
-- `src/Email.Application`: contratos, validações com FluentValidation, `SendEmailCommandHandler`, `EmailProcessingService`, opções de processamento.
-- `src/Email.Infrastructure`: integrações (RabbitMQ, SMTP via MailKit), métricas (`Meter`), armazenamento em memória e DI.
-- `src/Email.Api`: ASP.NET Core com controllers, autenticação JWT, Swagger, health checks e OpenTelemetry.
-- `src/Email.Worker`: serviço hospedado que utiliza `EmailProcessingService` e expõe telemetria.
-- `src/Email.ApiGateway`: gateway Ocelot com Dockerfile próprio.
-- `docker-compose.yml` + `deploy/otel-collector-config.yaml`: infraestrutura observável (RabbitMQ, Mailhog, Elastic, Grafana, OTel Collector).
+1. **Clone o repositório**
+   ```bash
+   git clone <url-do-repositorio>
+   cd AnfMicroserviceSolution
+   ```
 
-### Endpoints principais
+2. **Suba a infraestrutura**
+   ```bash
+   scripts\infra-up.bat
+   ```
 
-- `POST /api/Auth/token`: gera JWT temporário (use em Swagger/Postman).
-- `POST /api/emails`: enfileira envios com templates, anexos (base64 ou link seguro), `cc`, `bcc`, `metadata`, `scheduleAt`.
-- `GET /api/emails/{id}`: consulta status (`Queued`, `Processing`, `Sent`, `Failed`, `DeadLettered`).
-- `GET /health`: liveness/readiness.
-- `Gateway`: expõe `/emails` e `/emails/{id}` via porta `9000`.
+3. **Execute a API**
+   - Abra `backend/EmailMicroserviceSolution.sln` no Visual Studio
+   - Configure `Email.Api` como projeto de inicialização
+   - Pressione F5
 
-Exemplo de carga pronta para produção:
+4. **Execute o Worker** (opcional)
+   - Configure `Email.Worker` como segundo projeto de inicialização
 
-```json
+5. **Execute o Frontend**
+   ```bash
+   cd frontend/email-front
+   npm install
+   ng serve
+   ```
+
+## 📚 Documentação
+
+- [Como Rodar o Projeto](docs/COMO-RODAR.md)
+- [Estrutura Reorganizada](docs/ESTRUTURA-REORGANIZADA.md)
+- [Guia do Desenvolvedor](backend/docs/dev-desperate-guide.md)
+
+## 🏗️ Arquitetura
+
+### Backend
+- **Email.Api**: API REST com autenticação JWT
+- **Email.Worker**: Processamento assíncrono de e-mails via RabbitMQ
+- **Email.ApiGateway**: API Gateway usando Ocelot
+- **Email.Application**: Casos de uso e handlers
+- **Email.Domain**: Entidades e value objects
+- **Email.Infrastructure**: Implementações de infraestrutura
+
+### Frontend
+- **Angular 18+**: Framework frontend
+- **Standalone Components**: Arquitetura moderna
+- **Reactive Forms**: Formulários reativos
+- **HTTP Client**: Comunicação com API
+
+### Infraestrutura
+- **RabbitMQ**: Fila de mensagens
+- **Mailhog**: Servidor SMTP para desenvolvimento
+- **OpenTelemetry**: Observabilidade (métricas e traces)
+- **Grafana**: Visualização de métricas
+- **ElasticSearch**: Armazenamento de logs (opcional)
+
+## 🔧 Tecnologias
+
+### Backend
+- .NET 8
+- ASP.NET Core
+- Entity Framework Core
+- RabbitMQ.Client
+- Serilog
+- OpenTelemetry
+- Ocelot
+
+### Frontend
+- Angular 18+
+- TypeScript
+- RxJS
+- Angular Material (planejado)
+
+### DevOps
+- Docker & Docker Compose
+- GitHub Actions
+- Trivy (security scanning)
+
+## 📝 Endpoints da API
+
+### Autenticação
+- `POST /api/Auth/token` - Gerar token JWT
+
+### E-mails
+- `POST /api/Emails` - Enviar e-mail (requer autenticação)
+- `GET /api/Emails/{id}` - Consultar status do e-mail (requer autenticação)
+
+## 🧪 Testes
+
+```bash
+cd backend
+dotnet test
+```
+
+## 🐳 Docker
+
+### Subir todos os serviços
+```bash
+docker compose up -d
+```
+
+### Subir apenas infraestrutura
+```bash
+docker compose up rabbitmq smtp-service otel-collector -d
+```
+
+## 🔐 Autenticação
+
+A API usa JWT para autenticação. Para obter um token:
+
+```bash
+POST http://localhost:5041/api/Auth/token
+Content-Type: application/json
+
 {
-  "subject": "Boleto Novembro/2025",
-  "body": "<p>Fallback caso o template não seja encontrado.</p>",
-  "isHtml": true,
-  "to": [{ "name": "Carla Souza", "address": "carla@empresa.com" }],
-  "cc": [{ "name": "Financeiro", "address": "fin@empresa.com" }],
-  "bcc": [{ "name": "Auditoria", "address": "audit@empresa.com" }],
-  "attachments": [
-    {
-      "fileName": "boleto.pdf",
-      "contentType": "application/pdf",
-      "base64Content": "JVBERi0xLjQKJcTl8uXr..."
-    },
-    {
-      "fileName": "relatorio.csv",
-      "contentType": "text/csv",
-      "externalUrl": "https://storage.empresa.com/relatorios/123.csv"
-    }
-  ],
-  "scheduleAt": "2025-11-14T21:28:04.834Z",
-  "templateId": "boleto-padrao",
-  "templateData": {
-    "nome_cliente": "Carla Souza",
-    "vencimento": "14/11/2025",
-    "valor": "R$ 850,00"
-  },
-  "metadata": {
-    "prioridade": "alta",
-    "categoria": "boletos"
-  }
+  "userName": "usuario",
+  "email": "usuario@example.com",
+  "role": "admin"
 }
 ```
 
-### Como executar
+Use o token retornado no header:
+```
+Authorization: Bearer <token>
+```
 
-1. **Executar testes**
-   ```bash
-   dotnet test
-   ```
-2. **Executar localmente**
-   ```bash
-   dotnet run --project src/Email.Api/Email.Api.csproj
-   dotnet run --project src/Email.Worker/Email.Worker.csproj
-   dotnet run --project src/Email.ApiGateway/Email.ApiGateway.csproj
-   ```
-3. **Subir stack completa**
-   ```bash
-   docker compose up --build
-   ```
-   - API em `http://localhost:8080`
-   - Gateway em `http://localhost:9000`
-   - RabbitMQ UI em `http://localhost:15672`
-   - Mailhog em `http://localhost:8025`
-   - Grafana em `http://localhost:3000`
-   - ElasticSearch em `http://localhost:9200`
+## 📊 Observabilidade
 
-### Próximos passos sugeridos
+- **Grafana**: http://localhost:3000
+- **Mailhog UI**: http://localhost:8025
+- **RabbitMQ Management**: http://localhost:15672 (guest/guest)
 
-- Adicionar persistência durável (PostgreSQL, Mongo ou Elastic) para histórico.
-- Implementar integrações WhatsApp/SMS e suporte a anexos volumosos (ZIP, exames, laudos).
-- Criar dashboard customizado no Grafana + alertas baseados em métricas expostas.
-- Implementar circuit breaker (Polly) para SMTP e mensageria, reforçando resiliência.
+## 🤝 Contribuindo
 
-### CI/CD
+1. Faça fork do projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
+3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
+4. Push para a branch (`git push origin feature/AmazingFeature`)
+5. Abra um Pull Request
 
-O projeto inclui workflows do GitHub Actions para:
+## 📄 Licença
 
-- **CI (Continuous Integration)**: Build, testes e validação de código em cada push/PR
-- **CD (Continuous Deployment)**: Build e push de imagens Docker para GitHub Container Registry
-- **Testes de Integração**: Validação completa da stack com Docker Compose
-- **Security Scanning**: Análise de vulnerabilidades com Trivy
+Este projeto está sob a licença MIT.
 
-Workflows disponíveis:
-- `.github/workflows/ci.yml` - Build e testes
-- `.github/workflows/cd.yml` - Deploy e publicação de imagens
-- `.github/workflows/docker-compose-test.yml` - Testes de integração
+## 👥 Autores
 
-### Estilo e boas práticas
+- Desenvolvedor - [GitHub](https://github.com/anfsusax)
 
-- Código orientado a Clean Architecture (camadas desacopladas por DI).
-- SOLID aplicado em abstrações e serviços especializados.
-- Observabilidade nativa (OpenTelemetry + OTLP) pronta para ELK/Grafana.
-- Dockerfiles individuais e compose para facilitar CI/CD.
-- GitHub Actions configurado para automação completa.
+## 🙏 Agradecimentos
 
-Que este sistema seja como os muros de Jerusalém: cada tijolo foi colocado com propósito e vigilância, garantindo proteção para que as “mensagens” (boletos, exames, notificações) alcancem seus destinatários com fidelidade.
+- Comunidade .NET
+- Comunidade Angular
+- Todos os mantenedores das bibliotecas open-source utilizadas
 

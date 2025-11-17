@@ -22,11 +22,14 @@ jobs:
       matrix:
         service:
           - name: email-api
-            dockerfile: ./src/Email.Api/Dockerfile
+            dockerfile: ./backend/src/Email.Api/Dockerfile
+            context: ./backend
           - name: email-worker
-            dockerfile: ./src/Email.Worker/Dockerfile
+            dockerfile: ./backend/src/Email.Worker/Dockerfile
+            context: ./backend
           - name: email-gateway
-            dockerfile: ./src/Email.ApiGateway/Dockerfile
+            dockerfile: ./backend/src/Email.ApiGateway/Dockerfile
+            context: ./backend
 
     steps:
     - name: Checkout code
@@ -58,7 +61,7 @@ jobs:
     - name: Build and push Docker image
       uses: docker/build-push-action@v5
       with:
-        context: .
+        context: ${{ matrix.service.context }}
         file: ${{ matrix.service.dockerfile }}
         push: true
         tags: ${{ steps.meta.outputs.tags }}

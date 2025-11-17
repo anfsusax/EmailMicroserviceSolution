@@ -10,7 +10,7 @@ COPY ["src/Email.Api/Email.Api.csproj", "src/Email.Api/"]
 COPY ["src/Email.Application/Email.Application.csproj", "src/Email.Application/"]
 COPY ["src/Email.Infrastructure/Email.Infrastructure.csproj", "src/Email.Infrastructure/"]
 COPY ["src/Email.Domain/Email.Domain.csproj", "src/Email.Domain/"]
-RUN dotnet restore "src/Email.Api/Email.Api.csproj"
+RUN dotnet restore "EmailMicroserviceSolution.sln"
 COPY . .
 WORKDIR "/src/src/Email.Api"
 RUN dotnet publish "Email.Api.csproj" -c Release -o /app/publish /p:UseAppHost=false

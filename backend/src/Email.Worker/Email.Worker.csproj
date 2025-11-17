@@ -22,6 +22,6 @@
   </ItemGroup>
   <!-- PreBuild event apenas para Visual Studio (não executa no Docker) -->
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent" Condition="'$(DockerBuild)' != 'true' AND '$(BuildingInsideVisualStudio)' == 'true'">
-    <Exec Command="cd /d $(SolutionDir) &amp;&amp; scripts\infra-up.bat" ContinueOnError="true" />
+    <Exec Command="cd /d $(SolutionDir).. &amp;&amp; scripts\infra-up.bat" ContinueOnError="true" />
   </Target>
 </Project>
