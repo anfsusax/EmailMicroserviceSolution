@@ -1,0 +1,60 @@
+<div class="login-container">
+  <div class="login-card">
+    <h1>Login</h1>
+    <p class="subtitle">Gere um token JWT para acessar a API</p>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="userName">Nome de Usuário *</label>
+        <input
+          id="userName"
+          type="text"
+          formControlName="userName"
+          class="form-control"
+          [class.invalid]="loginForm.get('userName')?.invalid && loginForm.get('userName')?.touched"
+          placeholder="Digite seu nome de usuário"
+        />
+        <div class="error-message" *ngIf="loginForm.get('userName')?.invalid && loginForm.get('userName')?.touched">
+          <span *ngIf="loginForm.get('userName')?.errors?.['required']">Nome de usuário é obrigatório</span>
+          <span *ngIf="loginForm.get('userName')?.errors?.['minlength']">Mínimo de 3 caracteres</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="email">E-mail (opcional)</label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          class="form-control"
+          placeholder="seu@email.com"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="role">Role (opcional)</label>
+        <input
+          id="role"
+          type="text"
+          formControlName="role"
+          class="form-control"
+          placeholder="admin, user, etc"
+        />
+      </div>
+
+      <div class="error-message" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+
+      <button
+        type="submit"
+        class="btn-primary"
+        [disabled]="loginForm.invalid || isLoading"
+      >
+        <span *ngIf="!isLoading">Entrar</span>
+        <span *ngIf="isLoading">Gerando token...</span>
+      </button>
+    </form>
+  </div>
+</div>
+

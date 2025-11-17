@@ -19,6 +19,18 @@ builder.Host.UseSerilog((context, services, config) =>
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+
+// Configurar CORS para permitir requisições do frontend Angular
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngular", policy =>
+    {
+        policy.WithOrigins("http://localhost:4200", "https://localhost:4200")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
 builder.Services.AddSwaggerGen(setup =>
 {
     setup.SwaggerDoc("v1", new() { Title = "Email API", Version = "v1" });
@@ -101,7 +113,14 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseSerilogRequestLogging();
-app.UseHttpsRedirection();
+app.UseCors("AllowAngular");
+
+// Desabilitar redirecionamento HTTPS em desenvolvimento para evitar problemas de CORS
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
+
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
