@@ -2,7 +2,10 @@ using System.Text;
 using Email.Api.Configuration;
 using Email.Application;
 using Email.Infrastructure;
+using Email.Infrastructure.HealthChecks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.IdentityModel.Tokens;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
@@ -102,7 +105,10 @@ builder.Services.AddOpenTelemetry()
                .AddOtlpExporter(options => options.Endpoint = new Uri(otlpEndpoint));
     });
 
-builder.Services.AddHealthChecks();
+// Health Checks
+builder.Services.AddHealthChecks()
+    .AddCheck<RabbitMqHealthCheck>("rabbitmq", tags: new[] { "ready", "dependencies" })
+    .AddCheck<SmtpHealthCheck>("smtp", tags: new[] { "ready", "dependencies" });
 
 var app = builder.Build();
 
@@ -124,5 +130,58 @@ if (!app.Environment.IsDevelopment())
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-app.MapHealthChecks("/health");
+
+// Health Check Endpoints
+app.MapHealthChecks("/health", new HealthCheckOptions
+{
+    ResponseWriter = async (context, report) =>
+    {
+        context.Response.ContentType = "application/json";
+        var result = System.Text.Json.JsonSerializer.Serialize(new
+        {
+            status = report.Status.ToString(),
+            checks = report.Entries.Select(e => new
+            {
+                name = e.Key,
+                status = e.Value.Status.ToString(),
+                description = e.Value.Description,
+                data = e.Value.Data,
+                duration = e.Value.Duration.TotalMilliseconds
+            }),
+            timestamp = DateTime.UtcNow
+        });
+        await context.Response.WriteAsync(result);
+    }
+});
+
+// Liveness probe - verifica se o serviço está vivo
+app.MapHealthChecks("/health/live", new HealthCheckOptions
+{
+    Predicate = _ => false // Não verifica nada, apenas retorna que está vivo
+});
+
+// Readiness probe - verifica se o serviço está pronto (dependências)
+app.MapHealthChecks("/health/ready", new HealthCheckOptions
+{
+    Predicate = check => check.Tags.Contains("ready"),
+    ResponseWriter = async (context, report) =>
+    {
+        context.Response.ContentType = "application/json";
+        var result = System.Text.Json.JsonSerializer.Serialize(new
+        {
+            status = report.Status.ToString(),
+            checks = report.Entries.Select(e => new
+            {
+                name = e.Key,
+                status = e.Value.Status.ToString(),
+                description = e.Value.Description,
+                data = e.Value.Data,
+                duration = e.Value.Duration.TotalMilliseconds
+            }),
+            timestamp = DateTime.UtcNow
+        });
+        await context.Response.WriteAsync(result);
+    }
+});
+
 app.Run();

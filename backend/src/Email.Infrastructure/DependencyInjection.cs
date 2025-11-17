@@ -4,6 +4,7 @@ using Email.Infrastructure.Mail;
 using Email.Infrastructure.Messaging;
 using Email.Infrastructure.Observability;
 using Email.Infrastructure.Persistence;
+using Email.Infrastructure.Security;
 using Email.Infrastructure.Templates;
 using Email.Infrastructure.Time;
 using Microsoft.Extensions.Configuration;
@@ -27,6 +28,10 @@ public static class DependencyInjection
         services.AddSingleton<IMetricsPublisher, EmailMetricsPublisher>();
         services.AddSingleton<IDateTimeProvider, SystemDateTimeProvider>();
         services.AddSingleton<ITemplateRenderer, InMemoryTemplateRenderer>();
+        
+        // Autenticação
+        services.AddSingleton<IUserRepository, InMemoryUserRepository>();
+        services.AddSingleton<IPasswordHasher, BcryptPasswordHasher>();
 
         return services;
     }

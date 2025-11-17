@@ -1,3 +1,4 @@
+using Email.Application.Auth;
 using Email.Application.Configuration;
 using Email.Application.Emails;
 using Email.Application.Processing;
@@ -16,6 +17,9 @@ public static class DependencyInjection
         services.AddScoped<IValidator<SendEmailCommand>, SendEmailCommandValidator>();
         services.AddScoped<IEmailCommandHandler, SendEmailCommandHandler>();
         services.AddSingleton<EmailProcessingService>();
+        
+        // Autenticação
+        services.AddScoped<IAuthService, AuthService>();
 
         return services;
     }
