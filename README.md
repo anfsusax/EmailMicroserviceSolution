@@ -1,6 +1,9 @@
 ## EmailMicroserviceSolution
 
-Este repositório traz um ecossistema de microserviços .NET 8 preparado para orquestrar o envio confiável de boletos e outras mensagens digitais. A arquitetura segue DDD, Clean Architecture e boas práticas de mensageria assíncrona, entregando API, Worker, Gateway, infraestrutura de observabilidade e orquestração Docker.
+[![CI - Build and Test](https://github.com/anfsusax/EmailMicroserviceSolution/actions/workflows/ci.yml/badge.svg)](https://github.com/anfsusax/EmailMicroserviceSolution/actions/workflows/ci.yml)
+[![Docker Compose Integration Test](https://github.com/anfsusax/EmailMicroserviceSolution/actions/workflows/docker-compose-test.yml/badge.svg)](https://github.com/anfsusax/EmailMicroserviceSolution/actions/workflows/docker-compose-test.yml)
+
+Este repositório traz um ecossistema de microserviços .NET 8 preparado para orquestrar o envio confiável de boletos e outras mensagens digitais. A arquitetura segue DDD, Clean Architecture e boas práticas de mensageria assíncrona, entregando API, Worker, Gateway, infraestrutura de observabilidade e orquestração Docker.
 
 ### Visão Geral (parábola inspirada em Neemias 4)
 
@@ -97,12 +100,27 @@ Exemplo de carga pronta para produção:
 - Criar dashboard customizado no Grafana + alertas baseados em métricas expostas.
 - Implementar circuit breaker (Polly) para SMTP e mensageria, reforçando resiliência.
 
+### CI/CD
+
+O projeto inclui workflows do GitHub Actions para:
+
+- **CI (Continuous Integration)**: Build, testes e validação de código em cada push/PR
+- **CD (Continuous Deployment)**: Build e push de imagens Docker para GitHub Container Registry
+- **Testes de Integração**: Validação completa da stack com Docker Compose
+- **Security Scanning**: Análise de vulnerabilidades com Trivy
+
+Workflows disponíveis:
+- `.github/workflows/ci.yml` - Build e testes
+- `.github/workflows/cd.yml` - Deploy e publicação de imagens
+- `.github/workflows/docker-compose-test.yml` - Testes de integração
+
 ### Estilo e boas práticas
 
 - Código orientado a Clean Architecture (camadas desacopladas por DI).
 - SOLID aplicado em abstrações e serviços especializados.
 - Observabilidade nativa (OpenTelemetry + OTLP) pronta para ELK/Grafana.
 - Dockerfiles individuais e compose para facilitar CI/CD.
+- GitHub Actions configurado para automação completa.
 
 Que este sistema seja como os muros de Jerusalém: cada tijolo foi colocado com propósito e vigilância, garantindo proteção para que as “mensagens” (boletos, exames, notificações) alcancem seus destinatários com fidelidade.
 

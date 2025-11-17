@@ -1,0 +1,68 @@
+name: Docker Compose Integration Test
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+jobs:
+  integration-test:
+    name: Integration Test with Docker Compose
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Start infrastructure services
+      run: |
+        docker compose up -d rabbitmq smtp-service otel-collector
+
+    - name: Wait for services to be ready
+      run: |
+        echo "Waiting for RabbitMQ..."
+        timeout 60 bash -c 'until docker compose exec -T rabbitmq rabbitmqctl status; do sleep 2; done'
+        echo "Waiting for Mailhog..."
+        timeout 30 bash -c 'until curl -f http://localhost:8025/api/v2/messages; do sleep 2; done'
+
+    - name: Build application images
+      run: |
+        docker compose build email-api email-worker email-gateway
+
+    - name: Start application services
+      run: |
+        docker compose up -d email-api email-worker email-gateway
+
+    - name: Wait for API to be ready
+      run: |
+        echo "Waiting for Email API..."
+        timeout 60 bash -c 'until curl -f http://localhost:8080/health; do sleep 2; done'
+
+    - name: Run integration tests
+      run: |
+        echo "Testing API health endpoint..."
+        curl -f http://localhost:8080/health || exit 1
+        echo "Testing Gateway health..."
+        curl -f http://localhost:9000/ || exit 1
+        echo "Integration tests passed!"
+
+    - name: Check service logs
+      if: failure()
+      run: |
+        echo "=== Email API Logs ==="
+        docker compose logs email-api --tail 50
+        echo "=== Email Worker Logs ==="
+        docker compose logs email-worker --tail 50
+        echo "=== RabbitMQ Logs ==="
+        docker compose logs rabbitmq --tail 50
+
+    - name: Cleanup
+      if: always()
+      run: |
+        docker compose down -v
+
