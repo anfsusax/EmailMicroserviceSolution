@@ -44,6 +44,7 @@ builder.Services.AddOcelot(builder.Configuration);
 var app = builder.Build();
 
 app.MapGet("/", () => "Email API Gateway em execução.");
+app.MapGet("/health", () => Results.Ok(new { status = "healthy", service = "Email.ApiGateway" }));
 
 app.UseAuthentication();
 app.UseAuthorization();

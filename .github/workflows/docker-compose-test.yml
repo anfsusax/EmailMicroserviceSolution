@@ -52,13 +52,22 @@ jobs:
         echo "Waiting for Email API..."
         timeout 120 bash -c 'until curl -f http://localhost:8080/health 2>/dev/null; do echo "Waiting for API..."; sleep 3; done' || (docker compose logs email-api --tail 50 && exit 1)
         echo "Email API is ready!"
+        
+        echo "Waiting for Email Gateway..."
+        timeout 120 bash -c 'until curl -f http://localhost:9000/health 2>/dev/null; do echo "Waiting for Gateway..."; sleep 3; done' || (docker compose logs email-gateway --tail 50 && exit 1)
+        echo "Email Gateway is ready!"
 
     - name: Run integration tests
       run: |
         echo "Testing API health endpoint..."
         curl -f http://localhost:8080/health || exit 1
-        echo "Testing Gateway health..."
+        echo ""
+        echo "Testing Gateway health endpoint..."
+        curl -f http://localhost:9000/health || exit 1
+        echo ""
+        echo "Testing Gateway root endpoint..."
         curl -f http://localhost:9000/ || exit 1
+        echo ""
         echo "Integration tests passed!"
 
     - name: Check service logs
