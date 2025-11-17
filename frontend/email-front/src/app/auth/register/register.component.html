@@ -1,0 +1,109 @@
+<div class="register-container">
+  <div class="register-card">
+    <h1>Cadastro</h1>
+    <p class="subtitle">Crie sua conta para acessar o sistema</p>
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="userName">Nome de Usuário *</label>
+        <input
+          id="userName"
+          type="text"
+          formControlName="userName"
+          class="form-control"
+          [class.invalid]="registerForm.get('userName')?.invalid && registerForm.get('userName')?.touched"
+          placeholder="Digite seu nome de usuário"
+          autocomplete="username"
+        />
+        <div class="error-message" *ngIf="registerForm.get('userName')?.invalid && registerForm.get('userName')?.touched">
+          <span *ngIf="registerForm.get('userName')?.errors?.['required']">Nome de usuário é obrigatório</span>
+          <span *ngIf="registerForm.get('userName')?.errors?.['minlength']">Mínimo de 3 caracteres</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="email">E-mail *</label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          class="form-control"
+          [class.invalid]="registerForm.get('email')?.invalid && registerForm.get('email')?.touched"
+          placeholder="seu@email.com"
+          autocomplete="email"
+        />
+        <div class="error-message" *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched">
+          <span *ngIf="registerForm.get('email')?.errors?.['required']">E-mail é obrigatório</span>
+          <span *ngIf="registerForm.get('email')?.errors?.['email']">E-mail inválido</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Senha *</label>
+        <input
+          id="password"
+          type="password"
+          formControlName="password"
+          class="form-control"
+          [class.invalid]="registerForm.get('password')?.invalid && registerForm.get('password')?.touched"
+          placeholder="Mínimo 6 caracteres"
+          autocomplete="new-password"
+        />
+        <div class="error-message" *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched">
+          <span *ngIf="registerForm.get('password')?.errors?.['required']">Senha é obrigatória</span>
+          <span *ngIf="registerForm.get('password')?.errors?.['minlength']">Mínimo de 6 caracteres</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="confirmPassword">Confirmar Senha *</label>
+        <input
+          id="confirmPassword"
+          type="password"
+          formControlName="confirmPassword"
+          class="form-control"
+          [class.invalid]="registerForm.get('confirmPassword')?.invalid && registerForm.get('confirmPassword')?.touched"
+          placeholder="Digite a senha novamente"
+          autocomplete="new-password"
+        />
+        <div class="error-message" *ngIf="registerForm.get('confirmPassword')?.invalid && registerForm.get('confirmPassword')?.touched">
+          <span *ngIf="registerForm.get('confirmPassword')?.errors?.['required']">Confirmação de senha é obrigatória</span>
+          <span *ngIf="registerForm.get('confirmPassword')?.errors?.['passwordMismatch']">As senhas não coincidem</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="role">Role (opcional)</label>
+        <input
+          id="role"
+          type="text"
+          formControlName="role"
+          class="form-control"
+          placeholder="admin, user, etc"
+        />
+      </div>
+
+      <div class="error-message" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+
+      <div class="success-message" *ngIf="successMessage">
+        {{ successMessage }}
+      </div>
+
+      <button
+        type="submit"
+        class="btn-primary"
+        [disabled]="registerForm.invalid || isLoading"
+      >
+        <span *ngIf="!isLoading">Cadastrar</span>
+        <span *ngIf="isLoading">Cadastrando...</span>
+      </button>
+
+      <div class="login-link">
+        <p>Já tem uma conta? <a routerLink="/login">Faça login</a></p>
+      </div>
+    </form>
+  </div>
+</div>
+

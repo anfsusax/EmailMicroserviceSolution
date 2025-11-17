@@ -1,10 +1,10 @@
-.login-container {
+.register-container {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #1e3c72 100%);
   padding: 20px;
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #1e3c72 100%);
   position: relative;
   overflow: hidden;
 
@@ -22,15 +22,15 @@
   }
 }
 
-.login-card {
+.register-card {
   background: #ffffff;
   border-radius: 16px;
   padding: 48px 40px;
-  width: 100%;
-  max-width: 440px;
   box-shadow: 
     0 20px 60px rgba(0, 0, 0, 0.3),
     0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+  width: 100%;
+  max-width: 500px;
   position: relative;
   z-index: 1;
   backdrop-filter: blur(10px);
@@ -45,10 +45,10 @@
   }
 
   .subtitle {
-    color: #6b7280;
-    margin: 0 0 40px 0;
-    font-size: 15px;
     text-align: center;
+    color: #6b7280;
+    margin-bottom: 40px;
+    font-size: 15px;
     font-weight: 400;
     line-height: 1.5;
   }
@@ -118,6 +118,20 @@
   gap: 8px;
 }
 
+.success-message {
+  background: #f0fdf4;
+  color: #16a34a;
+  padding: 14px 16px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  border: 1px solid #bbf7d0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .btn-primary {
   width: 100%;
   padding: 16px;
@@ -153,7 +167,7 @@
   }
 }
 
-.register-link {
+.login-link {
   text-align: center;
   margin-top: 32px;
   padding-top: 24px;
