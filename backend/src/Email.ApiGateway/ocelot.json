@@ -46,7 +46,9 @@
     }
   ],
   "GlobalConfiguration": {
-    "BaseUrl": "http://localhost:9000"
+    "BaseUrl": "http://localhost:9000",
+    "RequestIdKey": "OcRequestId",
+    "DownstreamScheme": "http"
   }
 }
 

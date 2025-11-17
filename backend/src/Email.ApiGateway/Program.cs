@@ -43,11 +43,32 @@ builder.Services.AddOcelot(builder.Configuration);
 
 var app = builder.Build();
 
-app.MapGet("/", () => "Email API Gateway em execução.");
-app.MapGet("/health", () => Results.Ok(new { status = "healthy", service = "Email.ApiGateway" }));
-
+// Middleware de autenticação e autorização
 app.UseAuthentication();
 app.UseAuthorization();
 
+// Middleware para rotas diretas (antes do Ocelot)
+app.Use(async (context, next) =>
+{
+    var path = context.Request.Path.Value;
+    
+    if (path == "/")
+    {
+        context.Response.ContentType = "text/plain; charset=utf-8";
+        await context.Response.WriteAsync("Email API Gateway em execução.");
+        return;
+    }
+    
+    if (path == "/health")
+    {
+        context.Response.ContentType = "application/json";
+        await context.Response.WriteAsync("""{"status":"healthy","service":"Email.ApiGateway"}""");
+        return;
+    }
+    
+    await next();
+});
+
+// Ocelot processa apenas rotas que não foram tratadas pelo middleware acima
 await app.UseOcelot();
 await app.RunAsync();
